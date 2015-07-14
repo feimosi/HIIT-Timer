@@ -1,5 +1,5 @@
 // Include gulp
-var gulp = require('gulp'); 
+var gulp = require('gulp');
 
 // Include Our Plugins
 var jshint = require('gulp-jshint');
@@ -36,12 +36,13 @@ var src = {
 
 var vendor = {
     js: [
-        appDir + '/bower_components/angular/angular.min.js'
+        appDir + '/bower_components/underscore/underscore-min.js',
+        appDir + '/bower_components/backbone/backbone-min.js'
     ],
     css: [
         appDir + '/bower_components/pure/pure-min.css'
     ]
-}
+};
 
 // Lint JS
 gulp.task('lint', function() {
@@ -99,7 +100,7 @@ gulp.task('html', function() {
     conditionals: true,
     spare:true
   };
- 
+
   return gulp.src(src.html)
     .pipe(minifyHTML(opts))
     .pipe(gulp.dest(dst.html));
@@ -148,4 +149,4 @@ gulp.task('clean', function (cb) {
 });
 
 // Default Task
-gulp.task('default', ['js', 'css', 'html', 'watch', 'browser-sync']);
+gulp.task('default', ['vendor', 'js', 'css', 'html', 'watch', 'browser-sync']);
