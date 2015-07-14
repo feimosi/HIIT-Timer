@@ -1,104 +1,89 @@
-// Include gulp
-var gulp = require('gulp');
+var gulp = require('gulp'),
+  browserify = require('browserify'),
+  watchify = require('watchify'),
+  source = require('vinyl-source-stream');
 
-// Include Our Plugins
-var jshint = require('gulp-jshint');
-var sass = require('gulp-sass');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-var cssmin = require('gulp-cssmin');
-var bump = require('gulp-bump');
-var minifyHTML = require('gulp-minify-html');
-var autoprefixer = require('gulp-autoprefixer');
-var browserSync = require('browser-sync').create();
-var print = require('gulp-print');
-var del = require('del');
+var util = require('gulp-util'),
+  jshint = require('gulp-jshint'),
+  sass = require('gulp-sass'),
+  concat = require('gulp-concat'),
+  uglify = require('gulp-uglify'),
+  cssmin = require('gulp-cssmin'),
+  bump = require('gulp-bump'),
+  minifyHTML = require('gulp-minify-html'),
+  autoprefixer = require('gulp-autoprefixer'),
+  browserSync = require('browser-sync').create(),
+  print = require('gulp-print'),
+  del = require('del');
 
-// Variables
-var appDir = 'app/',
-	buildDir = 'build/',
-	tmpDir = '.tmp/';
+// Constants
+var APP_DIR = 'app/',
+  BUILD_DIR = 'build/',
+  TMP_DIR = '.tmp/';
 
 var src = {
-        scss: appDir + 'scss/*.scss',
-        js: appDir + 'js/*.js',
-        html: appDir + 'index.html'
-    },
-    dst = {
-        css: buildDir + 'css/',
-        js: buildDir + 'js/',
-        html: buildDir
-    },
-    tmp = {
-    	css: tmpDir + 'css/'
-    };
+    scss: APP_DIR + 'scss/**/*.scss',
+    js: APP_DIR + 'js/**/*.js',
+    html: APP_DIR + '*.html'
+  },
+  dst = {
+    css: BUILD_DIR + 'css/',
+    js: BUILD_DIR + 'js/',
+    html: BUILD_DIR
+  },
+  tmp = {
+    css: TMP_DIR + 'css/'
+  };
 
 var vendor = {
-    js: [
-        appDir + '/bower_components/underscore/underscore-min.js',
-        appDir + '/bower_components/backbone/backbone-min.js'
-    ],
-    css: [
-        appDir + '/bower_components/pure/pure-min.css'
-    ]
+  css: [
+    APP_DIR + '/bower_components/pure/pure-min.css'
+  ]
 };
 
-// Lint JS
-gulp.task('lint', function() {
-    return gulp.src(src.js)
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'));
+gulp.task('js', ['lint-js', 'uglify-js']);
+
+gulp.task('lint-js', function() {
+  return gulp.src(src.js)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'));
 });
 
-// Concatenate & Minify JS
-gulp.task('js', ['lint'], function() {
-    return gulp.src(src.js)
-        .pipe(concat('main.js'))
-        .pipe(gulp.dest(dst.js))
-        .pipe(rename('main.min.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(dst.js));
+gulp.task('uglify-js', function() {
+  return gulp.src(dst.js)
+    .pipe(uglify())
+    .pipe(gulp.dest(dst.js));
 });
 
-gulp.task('vendor.js', function() {
-    return gulp.src(vendor.js)
-        .pipe(print())
-        .pipe(concat('vendor.min.js'))
-        .pipe(gulp.dest(dst.js));
+gulp.task('vendor', ['concat-vendor-css']);
+
+gulp.task('concat-vendor-css', function() {
+  return gulp.src(vendor.css)
+    .pipe(print())
+    .pipe(concat('vendor.min.css'))
+    .pipe(gulp.dest(dst.css));
 });
 
-gulp.task('vendor.css', function() {
-    return gulp.src(vendor.css)
-        .pipe(print())
-        .pipe(concat('vendor.min.css'))
-        .pipe(gulp.dest(dst.css));
-});
-
-gulp.task('vendor', ['vendor.js', 'vendor.css']);
-
-// Compile Sass
-gulp.task('sass', function() {
-    return gulp.src(src.scss)
-        .pipe(sass())
-        .pipe(gulp.dest(tmp.css));
-});
-
-// Process CSS
 gulp.task('css', ['sass'], function() {
-    return gulp.src(tmp.css + '*.css')
-        .pipe(autoprefixer())
-        .pipe(concat('main.css'))
-        .pipe(gulp.dest(dst.css))
-        .pipe(concat('main.min.css'))
-        .pipe(cssmin())
-        .pipe(gulp.dest(dst.css));
+  return gulp.src(tmp.css + '*.css')
+    .pipe(autoprefixer())
+    .pipe(concat('main.css'))
+    .pipe(gulp.dest(dst.css))
+    .pipe(concat('main.min.css'))
+    .pipe(cssmin())
+    .pipe(gulp.dest(dst.css));
+});
+
+gulp.task('sass', function() {
+  return gulp.src(src.scss)
+    .pipe(sass())
+    .pipe(gulp.dest(tmp.css));
 });
 
 gulp.task('html', function() {
   var opts = {
     conditionals: true,
-    spare:true
+    spare: true
   };
 
   return gulp.src(src.html)
@@ -106,47 +91,68 @@ gulp.task('html', function() {
     .pipe(gulp.dest(dst.html));
 });
 
-// Bump to a new version
-gulp.task('bump-minor', function () {
+gulp.task('bump-minor', function() {
   return gulp.src(['./bower.json', './package.json'])
-    .pipe(plugins.bump({type:'minor'}))
+    .pipe(plugins.bump({
+      type: 'minor'
+    }))
     .pipe(gulp.dest('./'));
 });
 
-// Bump to a new version
-gulp.task('bump-patch', function () {
+gulp.task('bump-patch', function() {
   return gulp.src(['./bower.json', './package.json'])
-    .pipe(plugins.bump({type:'patch'}))
+    .pipe(plugins.bump({
+      type: 'patch'
+    }))
     .pipe(gulp.dest('./'));
 });
 
-// Watch Files For Changes
-gulp.task('watch', function() {
-    gulp.watch(src.js, ['js']);
-    gulp.watch(src.scss, ['css']);
-    gulp.watch(src.html, ['html']);
+gulp.task('watch', ['watch-html', 'watch-css', 'watch-js']);
+
+gulp.task('watch-html', function() {
+  gulp.watch(src.html, ['html']);
+});
+
+gulp.task('watch-css', function() {
+  gulp.watch(src.scss, ['css']);
+});
+
+gulp.task('watch-js', function() {
+  var watchifyBundle = watchify(browserify(APP_DIR + 'js/app.js'));
+
+  var updateOnChange = function() {
+    return watchifyBundle
+      .bundle()
+      .on('error', util.log.bind(util, 'Browserify Error'))
+      .pipe(source('app.js'))
+      .pipe(gulp.dest('./build/js/'));
+  };
+
+  watchifyBundle
+    .on('log', util.log)
+    .on('update', updateOnChange);
+  updateOnChange();
 });
 
 gulp.task('browser-sync', function() {
-   var files = [
-		dst.html + '*.html',
-		dst.css + '*.css',
-		dst.js + '*.js'
-	];
+  var files = [
+    dst.html + '*.html',
+    dst.css + '*.css',
+    dst.js + '*.js'
+  ];
 
-    browserSync.init(files, {
-        server: {
-            baseDir: "./build/"
-        }
-    });
+  browserSync.init(files, {
+    server: {
+      baseDir: "./build/"
+    }
+  });
 });
 
-gulp.task('clean', function (cb) {
+gulp.task('clean', function(cb) {
   del([
-    tmpDir,
-    buildDir
+    TMP_DIR,
+    BUILD_DIR
   ], cb);
 });
 
-// Default Task
-gulp.task('default', ['vendor', 'js', 'css', 'html', 'watch', 'browser-sync']);
+gulp.task('default', ['html', 'css', 'js', 'vendor', 'watch', 'browser-sync']);
