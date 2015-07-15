@@ -1,7 +1,14 @@
 var Backbone = require('backbone');
 var $ = require('jquery');
-var Timer = require('./models/timer');
+var Timer = require('./models/Timer');
+var SetupTimerView = require('./views/SetupTimerView');
 
 var timer = new Timer();
+var setupTimerView = new SetupTimerView({
+    model: timer
+});
 
-console.log(timer.toJSON());
+$(document).ready(function() {
+    console.log(setupTimerView.model.toJSON());
+    setupTimerView.render();
+});
