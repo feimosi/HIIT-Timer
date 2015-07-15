@@ -37,7 +37,7 @@ var src = {
 
 var vendor = {
   css: [
-    APP_DIR + '/bower_components/pure/pure-min.css'
+    APP_DIR + '/bower_components/uikit/css/uikit.min.css'
   ]
 };
 
