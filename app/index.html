@@ -11,37 +11,69 @@
 <body>
 	<div class="uk-grid" id="main-caontainer">
 		<div id="setup-container" class="uk-width-1-2 uk-container-center"></div>
+		<div id="timer-container" class="uk-width-1-2 uk-container-center"></div>
 	</div>
 	<script src="js/app.js"></script>
 </body>
 
 <script type="text/template" id="setup-timer-template">
-	<h1>HIIT Timer</h1>
+	<h1>HIIT Timer Setup</h1>
 	<form class="uk-form">
 		<fieldset>
-		<div class="uk-form-row">
-			<label>Sets:</label>
-			<input type="number" value="<%= sets %>">
-		</div>
-		<div class="uk-form-row">
-			<label>Warmup:</label>
-			<input type="number" value="<%= length.warmup %>">
-		</div>
-		<div class="uk-form-row">
-			<label>High Intensity:</label>
-			<input type="number" value="<%= length.highIntensity %>">
-		</div>
-		<div class="uk-form-row">
-			<label>Low Intensity:</label>
-			<input type="number" value="<%= length.lowIntensity %>">
-		</div>
-		<div class="uk-form-row">
-			<label>Cooldown:</label>
-			<input type="number" value="<%= length.cooldown %>">
-		</div>
-		<button class="uk-button">Submit</button>
+			<div class="uk-form-row">
+				<label>Warmup:</label>
+				<input type="number" value="<%= length.warmup %>">
+			</div>
+			<div class="uk-form-row">
+				<label>High Intensity:</label>
+				<input type="number" value="<%= length.highIntensity %>">
+			</div>
+			<div class="uk-form-row">
+				<label>Low Intensity:</label>
+				<input type="number" value="<%= length.lowIntensity %>">
+			</div>
+			<div class="uk-form-row">
+				<label>Cooldown:</label>
+				<input type="number" value="<%= length.cooldown %>">
+			</div>
+			<div class="uk-form-row">
+				<label>Sets:</label>
+				<input type="number" value="<%= sets %>">
+			</div>
+			<button class="uk-button">Submit</button>
 		</fieldset>
 	</form>
+</script>
+
+<script type="text/template" id="timer-template">
+	<h1>HIIT Timer</h1>
+	<h2 id="timer-status">Get ready</h2>
+	<p id="timer-time">00:00</p>
+	<div class="uk-grid">
+		<div class="uk-width-1-2">
+			<span id="elapsed-label">Elapsed</span>
+			<span id="remaining-label">Remaining</span>
+			<span id="elapsed-time">00:00</span>
+			<span id="remaining-tim">00:00</span>
+		</div>
+		<div class="uk-width-1-2">
+			<span id="sets-label">Set:</span>
+			<span id="sets">0/0</span>
+		</div>
+	</div>
+	<div class="timer-menu">
+		<button class="uk-button start-pause-button">Pause</button>
+		<button class="uk-button restart-button">Restart</button>
+		<button class="uk-button return-button">Return</button>
+	</div>
+	<div class="progress-block">
+		<div class="timer-progress">Current progress</div>
+		<div class="general-progress">General progress</div>
+	</div>
+	<div class="share-block">
+		<label for="share-url-label">URL:</label>
+		<input type="url" name="share-url" id="share-url-input" spellcheck="false">
+	</div>
 </script>
 
 </html>
