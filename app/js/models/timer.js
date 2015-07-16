@@ -8,6 +8,9 @@ module.exports = Backbone.Model.extend({
             lowIntensity: 10,
             cooldown: 0
         },
-        sets: 10
+        sets: 10,
+        current: 'warmup',
+        currentSet: 0,
+        currentTime: 0
     }
 });
