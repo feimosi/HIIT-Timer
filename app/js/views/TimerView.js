@@ -1,6 +1,7 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
+var EventBus = require('../EventBus');
 
 module.exports = Backbone.View.extend({
     el: '#timer-container',

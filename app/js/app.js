@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 var $ = require('jquery');
+var EventBus = require('./EventBus');
 var Timer = require('./models/Timer');
 var SetupTimerView = require('./views/SetupTimerView');
 var TimerView = require('./views/TimerView');
