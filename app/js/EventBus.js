@@ -1,4 +1,10 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
 
-module.exports = _.extend({}, Backbone.Events);
+var EventBus = _.extend({}, Backbone.Events);
+
+EventBus.on('all', function(eventName){
+    console.log('>> EventBus >> ' + eventName);
+});
+
+module.exports = EventBus;
