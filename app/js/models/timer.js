@@ -11,6 +11,11 @@ module.exports = Backbone.Model.extend({
         sets: 10,
         current: 'warmup',
         currentSet: 0,
-        currentTime: 0
+        currentTime: 0,
+        running: false
+    },
+
+    isRunning: function() {
+        return this.running;
     }
 });
