@@ -14,6 +14,7 @@ var util = require('gulp-util'),
   autoprefixer = require('gulp-autoprefixer'),
   browserSync = require('browser-sync').create(),
   print = require('gulp-print'),
+  mocha = require('gulp-mocha'),
   del = require('del');
 
 // Constants
@@ -153,6 +154,11 @@ gulp.task('clean', function(cb) {
     TMP_DIR,
     BUILD_DIR
   ], cb);
+});
+
+gulp.task('test', function () {
+  return gulp.src('test/test.js', { read: false })
+    .pipe(mocha({ reporter: 'nyan' }));
 });
 
 gulp.task('default', ['html', 'css', 'js', 'vendor', 'watch', 'browser-sync']);
