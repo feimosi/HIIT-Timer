@@ -1,5 +1,6 @@
 var Timer = require('../app/js/models/Timer');
 var should = require('chai').should();
+var sinon = require('sinon');
 
 /*jshint -W030 */
 
@@ -52,7 +53,20 @@ describe('Timer after initialization', function() {
 describe('Timer during usage', function() {
 
     beforeEach(function() {
-        this.timer = new Timer();
+        this.timer = new Timer({
+            length: {
+                warmup: 5,
+                highIntensity: 20,
+                lowIntensity: 10,
+                cooldown: 5
+            }
+        });
+        var returnThisDummyFunction = function() {
+            return this;
+        };
+        sinon.stub(this.timer.timer, "start", returnThisDummyFunction);
+        sinon.stub(this.timer.timer, "stop", returnThisDummyFunction);
+        sinon.stub(this.timer.timer, "pause", returnThisDummyFunction);
     });
 
     it('should be reset on stop', function() {
@@ -82,13 +96,19 @@ describe('Timer during usage', function() {
         this.timer.isRunning().should.be.true;
     });
 
-    it('should time pass after 1 second on start', function(done) {
+    it('should time pass after 1 second on start', function() {
         var timer = this.timer;
         timer.start();
-        setTimeout(function() {
-            timer.getCurrentTime().should.be.greaterThan(0);
-            done();
-        }, 1000);
+        sinon.stub(this.timer.timer, "getDuration").returns(4); // 1 second pass
+        timer.getCurrentTime().should.be.equal(1);
+    });
+
+    it('should ', function() {
+        var timer = this.timer;
+        timer.start();
+        sinon.stub(this.timer.timer, "getDuration").returns(3); // 2 seconds pass
+        timer.pause();
+        timer.getCurrentTime().should.be.equal(2);
     });
 
     it('should step to the next part', function() {
