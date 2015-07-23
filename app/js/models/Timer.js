@@ -33,6 +33,9 @@ module.exports = backbone.Model.extend({
         this.clock = new TimerJS({
             onend: this.next.bind(this)
         });
+        eventBus.on('button:start', this.start, this);
+        eventBus.on('button:pause', this.pause, this);
+        eventBus.on('button:return', this.stop, this);
     },
 
     getNextPart: function() {

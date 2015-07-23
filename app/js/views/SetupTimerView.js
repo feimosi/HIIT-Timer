@@ -10,10 +10,10 @@ module.exports = backbone.View.extend({
     },
 
     initialize: function() {
-        eventBus.on('timer:submit', _.bind(function() {
+        eventBus.on('button:submit', _.bind(function() {
             this.$el.hide();
         }, this));
-        eventBus.on('timer:return', _.bind(function() {
+        eventBus.on('button:return', _.bind(function() {
             this.$el.show();
         }, this));
     },
@@ -23,6 +23,6 @@ module.exports = backbone.View.extend({
     },
     submitButtonClick: function(event) {
         event.preventDefault();
-        eventBus.trigger('timer:submit');
+        eventBus.trigger('button:submit');
     }
 });
