@@ -1,19 +1,19 @@
-var Backbone = require('backbone');
+var backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
-var EventBus = require('../EventBus');
+var eventBus = require('../EventBus');
 
-module.exports = Backbone.View.extend({
+module.exports = backbone.View.extend({
     el: '#setup-container',
     events: {
         'click .submit-button': 'submitButtonClick'
     },
 
     initialize: function() {
-        EventBus.on('timer:submit', _.bind(function() {
+        eventBus.on('timer:submit', _.bind(function() {
             this.$el.hide();
         }, this));
-        EventBus.on('timer:return', _.bind(function() {
+        eventBus.on('timer:return', _.bind(function() {
             this.$el.show();
         }, this));
     },
@@ -23,6 +23,6 @@ module.exports = Backbone.View.extend({
     },
     submitButtonClick: function(event) {
         event.preventDefault();
-        EventBus.trigger('timer:submit');
+        eventBus.trigger('timer:submit');
     }
 });

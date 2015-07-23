@@ -1,7 +1,8 @@
-var Backbone = require('backbone');
+var backbone = require('backbone');
 var TimerJS = require('timer.js');
+var eventBus = require('../EventBus.js');
 
-module.exports = Backbone.Model.extend({
+module.exports = backbone.Model.extend({
     defaults: {
         alias: {
             warmup: 'Warmup',
@@ -30,7 +31,7 @@ module.exports = Backbone.Model.extend({
 
     initialize: function() {
         this.clock = new TimerJS({
-            onend: this.next
+            onend: this.next.bind(this)
         });
     },
 
@@ -77,16 +78,19 @@ module.exports = Backbone.Model.extend({
             this.clock.start(this.getCurrentPartLength());
             this.set('running', true);
         }
+        eventBus.trigger('timer:start');
     },
 
     pause: function() {
         this.clock.pause();
         this.set('running', false);
+        eventBus.trigger('timer:pause');
     },
 
     continue: function() {
         this.clock.start();
         this.set('running', true);
+        eventBus.trigger('timer:continue');
     },
 
     stop: function() {
@@ -94,11 +98,13 @@ module.exports = Backbone.Model.extend({
         this.set('current', '');
         this.set('currentSet', 1);
         this.set('running', false);
+        eventBus.trigger('timer:stop');
     },
 
     next: function() {
         this.set('current', this.getNextPart());
         this.set('running', true);
         this.clock.stop().start(this.getCurrentPartLength());
+        eventBus.trigger('timer:next', this.getCurrentPartLength());
     }
 });

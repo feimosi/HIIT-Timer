@@ -1,9 +1,9 @@
-var Backbone = require('backbone');
+var backbone = require('backbone');
 var _ = require('underscore');
 var $ = require('jquery');
-var EventBus = require('../EventBus');
+var eventBus = require('../EventBus');
 
-module.exports = Backbone.View.extend({
+module.exports = backbone.View.extend({
     el: '#timer-container',
     events: {
         'click .start-pause-button': 'startPauseButtonClick',
@@ -12,10 +12,10 @@ module.exports = Backbone.View.extend({
     },
 
     initialize: function() {
-        EventBus.on('timer:return', _.bind(function() {
+        eventBus.on('timer:return', _.bind(function() {
             this.$el.hide();
         }, this));
-        EventBus.on('timer:submit', _.bind(function() {
+        eventBus.on('timer:submit', _.bind(function() {
             this.$el.show();
         }, this));
     },
@@ -26,17 +26,17 @@ module.exports = Backbone.View.extend({
     startPauseButtonClick: function() {
         event.preventDefault();
         if(this.model.isRunning())
-            EventBus.trigger('timer:pause');
+            eventBus.trigger('timer:pause');
         else {
-            EventBus.trigger('timer:start');
+            eventBus.trigger('timer:start');
         }
     },
     restartButtonClick: function() {
         event.preventDefault();
-        EventBus.trigger('timer:restart');
+        eventBus.trigger('timer:restart');
     },
     returnButtonClick: function() {
         event.preventDefault();
-        EventBus.trigger('timer:return');
+        eventBus.trigger('timer:return');
     }
 });
