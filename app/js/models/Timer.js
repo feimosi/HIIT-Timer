@@ -10,6 +10,7 @@ module.exports = Backbone.Model.extend({
             cooldown: 'Cooldown'
         },
         next: {
+            '': 'warmup',
             warmup: 'highIntensity',
             highIntensity: 'lowIntensity',
             lowIntensity: 'cooldown',
@@ -22,14 +23,15 @@ module.exports = Backbone.Model.extend({
             cooldown: 5
         },
         sets: 10,
-        current: 'warmup',
-        currentTime: 0,
+        current: '',
         currentSet: 1,
         running: false
     },
 
     initialize: function() {
-        this.timer = new TimerJS();
+        this.clock = new TimerJS({
+            onend: this.next
+        });
     },
 
     getNextPart: function() {
@@ -41,7 +43,7 @@ module.exports = Backbone.Model.extend({
     },
 
     getCurrentPartLength: function() {
-        return this.getPartLength(this.get('current'));
+        return this.get('current') ? this.getPartLength(this.get('current')) : 0;
     },
 
     getSetsCount: function() {
@@ -52,10 +54,8 @@ module.exports = Backbone.Model.extend({
         return this.get('current');
     },
 
-    getCurrentTime: function() {
-        if (this.isRunning())
-            this.set('currentTime', this.getCurrentPartLength() - this.timer.getDuration());
-        return this.get('currentTime');
+    getElapsedTime: function() {
+        return this.getCurrentPartLength() - this.clock.getDuration();
     },
 
     getCurrentSet: function() {
@@ -67,33 +67,38 @@ module.exports = Backbone.Model.extend({
     },
 
     getTimeLeft: function() {
-        return this.getCurrentPartLength() - this.getCurrentTime();
+        return this.clock.getDuration();
     },
 
     start: function() {
-        this.timer.start(this.getCurrentPartLength());
-        this.set('running', true);
+        if(this.get('current') === '') {
+            this.next();
+        } else {
+            this.clock.start(this.getCurrentPartLength());
+            this.set('running', true);
+        }
     },
 
     pause: function() {
-        this.timer.pause();
+        this.clock.pause();
         this.set('running', false);
     },
 
     continue: function() {
-        this.timer.start();
+        this.clock.start();
         this.set('running', true);
     },
 
     stop: function() {
-        this.timer.stop();
-        this.set('currentTime', 0);
+        this.clock.stop();
+        this.set('current', '');
         this.set('currentSet', 1);
         this.set('running', false);
     },
 
     next: function() {
         this.set('current', this.getNextPart());
-        this.timer.stop().start(this.getCurrentPartLength());
+        this.set('running', true);
+        this.clock.stop().start(this.getCurrentPartLength());
     }
 });
