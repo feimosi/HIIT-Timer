@@ -27,8 +27,10 @@ module.exports = backbone.View.extend({
         event.preventDefault();
         if(this.model.isRunning())
             eventBus.trigger('button:pause');
-        else {
+        else if(this.model.getCurrentPart()){
             eventBus.trigger('button:start');
+        } else {
+            eventBus.trigger('button:continue');
         }
     },
     restartButtonClick: function() {

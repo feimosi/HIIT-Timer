@@ -35,6 +35,8 @@ module.exports = backbone.Model.extend({
         });
         eventBus.on('button:start', this.start, this);
         eventBus.on('button:pause', this.pause, this);
+        eventBus.on('button:continue', this.continue, this);
+        eventBus.on('button:restart', this.restart, this);
         eventBus.on('button:return', this.stop, this);
     },
 
@@ -102,6 +104,12 @@ module.exports = backbone.Model.extend({
         this.set('currentSet', 1);
         this.set('running', false);
         eventBus.trigger('timer:stop');
+    },
+
+    restart: function() {
+        this.stop();
+        this.start();
+        eventBus.trigger('timer:restart');
     },
 
     next: function() {
