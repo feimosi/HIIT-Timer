@@ -77,7 +77,7 @@ module.exports = backbone.Model.extend({
     },
 
     start: function() {
-        if(this.get('current') === '') {
+        if (this.get('current') === '') {
             this.next();
         } else {
             this.clock.start(this.getCurrentPartLength());
@@ -113,9 +113,26 @@ module.exports = backbone.Model.extend({
     },
 
     next: function() {
+        this.incrementSetIfApplicable();
         this.set('current', this.getNextPart());
         this.set('running', true);
         this.clock.stop().start(this.getCurrentPartLength());
-        eventBus.trigger('timer:next', this.getCurrentPartLength());
+        if (this.getCurrentSet() > this.getSetsCount()) {
+            this.stop();
+            eventBus.trigger('timer:end');
+        } else if (this.getCurrentPartLength() === 0) {
+            this.next();
+            return;
+        } else {
+            eventBus.trigger('timer:next', this.getCurrentPart());
+        }
+    },
+
+    incrementSetIfApplicable: function() {
+        if (this.getCurrentPart() === 'cooldown') {
+            this.set('currentSet', this.getCurrentSet() + 1);
+            eventBus.trigger('timer:nextSet', this.getCurrentSet() + '/' + this.getSetsCount());
+        }
     }
+
 });

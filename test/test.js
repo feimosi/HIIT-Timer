@@ -66,7 +66,8 @@ describe('Timer during usage', function() {
                 highIntensity: 20,
                 lowIntensity: 10,
                 cooldown: 5
-            }
+            },
+            sets: 1
         });
         this.timer.clock.fastForward = function(seconds) {
             this.sinon.elapsedTime += seconds;
@@ -156,6 +157,16 @@ describe('Timer during usage', function() {
         this.timer.getCurrentPart().should.be.equal('highIntensity');
         this.timer.getCurrentPartLength().should.be.equal(20);
         this.timer.getTimeLeft().should.be.equal(this.timer.getPartLength('highIntensity'));
+    });
+
+    it('should finish after last set', function() {
+        this.timer.start();
+        this.timer.next();
+        this.timer.next();
+        this.timer.next();
+        this.timer.next();
+        this.timer.getCurrentPart().should.be.equal('');
+        this.timer.getCurrentPartLength().should.be.equal(0);
     });
 
 });
