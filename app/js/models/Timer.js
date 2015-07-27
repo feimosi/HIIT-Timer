@@ -26,7 +26,8 @@ module.exports = backbone.Model.extend({
         sets: 10,
         current: '',
         currentSet: 1,
-        running: false
+        running: false,
+        totalElapsedTime: 0
     },
 
     initialize: function() {
@@ -62,6 +63,10 @@ module.exports = backbone.Model.extend({
 
     getElapsedTime: function() {
         return this.getCurrentPartLength() - this.clock.getDuration();
+    },
+
+    getTotalElapsedTime: function() {
+        return this.get('totalElapsedTime') + this.getElapsedTime();
     },
 
     getCurrentSet: function() {
@@ -114,6 +119,7 @@ module.exports = backbone.Model.extend({
 
     next: function() {
         this.incrementSetIfApplicable();
+        this.set('totalElapsedTime', this.get('totalElapsedTime') + this.getCurrentPartLength());
         this.set('current', this.getNextPart());
         this.set('running', true);
         this.clock.stop().start(this.getCurrentPartLength());
