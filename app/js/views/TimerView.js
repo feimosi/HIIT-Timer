@@ -28,10 +28,11 @@ module.exports = backbone.View.extend({
     },
     startPauseButtonClick: function() {
         event.preventDefault();
-        if(this.model.isRunning())
+        if(this.model.isRunning()) {
             eventBus.trigger('button:pause');
-        else if(this.model.getCurrentPart()){
+        } else if(this.model.getCurrentPart() === ''){
             eventBus.trigger('button:start');
+            this.refreshDisplayedTime(this);
         } else {
             eventBus.trigger('button:continue');
         }
@@ -43,5 +44,20 @@ module.exports = backbone.View.extend({
     returnButtonClick: function() {
         event.preventDefault();
         eventBus.trigger('button:return');
+    },
+    refreshDisplayedTime: function(_this) {
+        // TODO: Refresh remaining time too
+        _this.$el.find('#timer-time').html(_this.convertSecondsToString(_this.model.getElapsedTime()));
+        _this.$el.find('#elapsed-time').html(_this.convertSecondsToString(_this.model.getTotalElapsedTime()));
+        if(_this.model.isRunning()) {
+            setTimeout(function() {
+                _this.refreshDisplayedTime(_this);
+            }, 100);
+        }
+    },
+    convertSecondsToString: function(seconds) {
+        var minutesPart = parseInt(seconds / 60);
+        var secondsPart = seconds % 60;
+        return ('0' + minutesPart).slice(-2) + ':' + ('0' + secondsPart).slice(-2);
     }
 });
