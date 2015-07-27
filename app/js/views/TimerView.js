@@ -12,16 +12,19 @@ module.exports = backbone.View.extend({
     },
 
     initialize: function() {
-        eventBus.on('button:return', _.bind(function() {
-            this.$el.hide();
-        }, this));
-        eventBus.on('button:submit', _.bind(function() {
-            this.$el.show();
-        }, this));
+        eventBus.on('button:return', this.hide.bind(this));
+        eventBus.on('button:submit', this.show.bind(this));
+        this.$el.hide();
+    },
+    show: function() {
+        this.$el.show();
+    },
+    hide: function() {
+        this.$el.hide();
     },
     render: function() {
         var template = _.template($('#timer-template').html());
-        this.$el.hide().html(template(this.model.toJSON()));
+        this.$el.html(template(this.model.toJSON()));
     },
     startPauseButtonClick: function() {
         event.preventDefault();
