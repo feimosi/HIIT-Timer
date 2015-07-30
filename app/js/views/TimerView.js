@@ -30,16 +30,23 @@ module.exports = backbone.View.extend({
         event.preventDefault();
         if(this.model.isRunning()) {
             eventBus.trigger('button:pause');
+            this.changeButtonLabel('.start-pause-button', 'Continue');
         } else if(this.model.getCurrentPart() === ''){
             eventBus.trigger('button:start');
-            this.refreshDisplayedTime(this);
+            this.changeButtonLabel('.start-pause-button', 'Pause');
         } else {
             eventBus.trigger('button:continue');
+            this.changeButtonLabel('.start-pause-button', 'Pause');
         }
+        this.refreshDisplayedTime(this);
     },
     restartButtonClick: function() {
         event.preventDefault();
         eventBus.trigger('button:restart');
+        this.changeButtonLabel('.start-pause-button', 'Start');
+    },
+    changeButtonLabel: function(selector, label) {
+        this.$el.find(selector).text(label);
     },
     returnButtonClick: function() {
         event.preventDefault();
