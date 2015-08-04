@@ -62,7 +62,7 @@ module.exports = backbone.Model.extend({
     },
 
     getElapsedTime: function() {
-        return this.getCurrentPartLength() - this.clock.getDuration();
+        return this.getCurrentPartLength() - this._getClockDuration();
     },
 
     getTotalElapsedTime: function() {
@@ -78,7 +78,7 @@ module.exports = backbone.Model.extend({
     },
 
     getTimeLeft: function() {
-        return this.clock.getDuration();
+        return this._getClockDuration();
     },
 
     start: function() {
@@ -139,6 +139,10 @@ module.exports = backbone.Model.extend({
             this.set('currentSet', this.getCurrentSet() + 1);
             eventBus.trigger('timer:nextSet', this.getCurrentSet() + '/' + this.getSetsCount());
         }
+    },
+
+    _getClockDuration: function() {
+        return parseInt(this.clock.getDuration() / 1000);
     }
 
 });
