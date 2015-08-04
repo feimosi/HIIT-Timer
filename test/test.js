@@ -70,7 +70,7 @@ describe('Timer during usage', function() {
             sets: 1
         });
         this.timer.clock.fastForward = function(seconds) {
-            this.sinon.elapsedTime += seconds;
+            this.sinon.elapsedTime += seconds * 1000;
         };
         var returnOnlyThis = function() {
             return this;
@@ -80,7 +80,7 @@ describe('Timer during usage', function() {
         sinon.stub(this.timer.clock, "pause", returnOnlyThis);
         sinon.stub(this.timer.clock, "start", function(time) {
             this.sinon = {};
-            this.sinon.time = time;
+            this.sinon.time = time * 1000;
             this.sinon.elapsedTime = 0;
         }.bind(this.timer.clock));
         sinon.stub(this.timer.clock, "getDuration", function() {
