@@ -6,9 +6,9 @@ var eventBus = require('../EventBus');
 module.exports = backbone.View.extend({
     el: '#timer-container',
     events: {
-        'click .start-pause-button': 'startPauseButtonClick',
-        'click .restart-button': 'restartButtonClick',
-        'click .return-button': 'returnButtonClick'
+        'click .start-pause-button': '_startPauseButtonHandler',
+        'click .restart-button': '_restartButtonHandler',
+        'click .return-button': '_returnButtonHandler'
     },
 
     initialize: function() {
@@ -26,43 +26,43 @@ module.exports = backbone.View.extend({
         var template = _.template($('#timer-template').html());
         this.$el.html(template(this.model.toJSON()));
     },
-    startPauseButtonClick: function() {
-        event.preventDefault();
-        if(this.model.isRunning()) {
-            eventBus.trigger('button:pause');
-            this.changeButtonLabel('.start-pause-button', 'Continue');
-        } else if(this.model.getCurrentPart() === ''){
-            eventBus.trigger('button:start');
-            this.changeButtonLabel('.start-pause-button', 'Pause');
-        } else {
-            eventBus.trigger('button:continue');
-            this.changeButtonLabel('.start-pause-button', 'Pause');
-        }
-        this.refreshDisplayedTime(this);
-    },
-    restartButtonClick: function() {
-        event.preventDefault();
-        eventBus.trigger('button:restart');
-        this.changeButtonLabel('.start-pause-button', 'Start');
-    },
-    changeButtonLabel: function(selector, label) {
-        this.$el.find(selector).text(label);
-    },
-    returnButtonClick: function() {
-        event.preventDefault();
-        eventBus.trigger('button:return');
-    },
     refreshDisplayedTime: function(_this) {
-        // TODO: Refresh remaining time too
-        _this.$el.find('#timer-time').html(_this.convertSecondsToString(_this.model.getElapsedTime()));
-        _this.$el.find('#elapsed-time').html(_this.convertSecondsToString(_this.model.getTotalElapsedTime()));
+        _this.$el.find('#timer-time').html(_this._convertSecondsToString(_this.model.getElapsedTime()));
+        _this.$el.find('#elapsed-time').html(_this._convertSecondsToString(_this.model.getTotalElapsedTime()));
+        _this.$el.find('#remaining-time').html(_this._convertSecondsToString(_this.model.getTotalTimeLeft()));
         if(_this.model.isRunning()) {
             setTimeout(function() {
                 _this.refreshDisplayedTime(_this);
-            }, 100);
+            }, 500);
         }
     },
-    convertSecondsToString: function(seconds) {
+    _startPauseButtonHandler: function() {
+        event.preventDefault();
+        if(this.model.isRunning()) {
+            eventBus.trigger('button:pause');
+            this._changeButtonLabel('.start-pause-button', 'Continue');
+        } else if(this.model.getCurrentPart() === ''){
+            eventBus.trigger('button:start');
+            this._changeButtonLabel('.start-pause-button', 'Pause');
+        } else {
+            eventBus.trigger('button:continue');
+            this._changeButtonLabel('.start-pause-button', 'Pause');
+        }
+        this.refreshDisplayedTime(this);
+    },
+    _restartButtonHandler: function() {
+        event.preventDefault();
+        eventBus.trigger('button:restart');
+        this._changeButtonLabel('.start-pause-button', 'Start');
+    },
+    _returnButtonHandler: function() {
+        event.preventDefault();
+        eventBus.trigger('button:return');
+    },
+    _changeButtonLabel: function(selector, label) {
+        this.$el.find(selector).text(label);
+    },
+    _convertSecondsToString: function(seconds) {
         var minutesPart = parseInt(seconds / 60);
         var secondsPart = seconds % 60;
         return ('0' + minutesPart).slice(-2) + ':' + ('0' + secondsPart).slice(-2);
