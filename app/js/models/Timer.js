@@ -69,16 +69,20 @@ module.exports = backbone.Model.extend({
         return this.get('totalElapsedTime') + this.getElapsedTime();
     },
 
+    getTimeLeft: function() {
+        return this._getClockDuration();
+    },
+
+    getTotalTimeLeft: function() {
+        return this.get('totalTimeLeft') - this.getElapsedTime();
+    },
+
     getCurrentSet: function() {
         return this.get('currentSet');
     },
 
     isRunning: function() {
         return this.get('running');
-    },
-
-    getTimeLeft: function() {
-        return this._getClockDuration();
     },
 
     start: function() {
@@ -88,6 +92,10 @@ module.exports = backbone.Model.extend({
             this.clock.start(this.getCurrentPartLength());
             this.set('running', true);
         }
+        this.set('totalTimeLeft', (this.getPartLength('warmup') +
+            this.getPartLength('highIntensity') +
+            this.getPartLength('lowIntensity') +
+            this.getPartLength('cooldown')) * this.getSetsCount());
         eventBus.trigger('timer:start');
     },
 
@@ -118,11 +126,20 @@ module.exports = backbone.Model.extend({
     },
 
     next: function() {
-        this.incrementSetIfApplicable();
+        this._incrementSetIfApplicable();
         this.set('totalElapsedTime', this.get('totalElapsedTime') + this.getCurrentPartLength());
+        this.set('totalTimeLeft', this.get('totalTimeLeft') - this.getCurrentPartLength());
         this.set('current', this.getNextPart());
         this.set('running', true);
-        this.clock.stop().start(this.getCurrentPartLength());
+
+        // FIXME:
+        // Workaround for the timer.js bug
+        // this.clock.stop().start(this.getCurrentPartLength());
+        this.clock = new TimerJS({
+            onend: this.next.bind(this)
+        });
+        this.clock.start(this.getCurrentPartLength());
+
         if (this.getCurrentSet() > this.getSetsCount()) {
             this.stop();
             eventBus.trigger('timer:end');
@@ -134,7 +151,7 @@ module.exports = backbone.Model.extend({
         }
     },
 
-    incrementSetIfApplicable: function() {
+    _incrementSetIfApplicable: function() {
         if (this.getCurrentPart() === 'cooldown') {
             this.set('currentSet', this.getCurrentSet() + 1);
             eventBus.trigger('timer:nextSet', this.getCurrentSet() + '/' + this.getSetsCount());
