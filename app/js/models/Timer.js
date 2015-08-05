@@ -27,7 +27,8 @@ module.exports = backbone.Model.extend({
         current: '',
         currentSet: 1,
         running: false,
-        totalElapsedTime: 0
+        totalElapsedTime: 0,
+        totalTimeLeft: 0
     },
 
     initialize: function() {
@@ -81,6 +82,12 @@ module.exports = backbone.Model.extend({
         return this.get('currentSet');
     },
 
+    getTotalTime: function() {
+        return (this.getPartLength('warmup') + this.getPartLength('highIntensity') +
+                this.getPartLength('lowIntensity') + this.getPartLength('cooldown')
+                ) * this.getSetsCount();
+    },
+
     isRunning: function() {
         return this.get('running');
     },
@@ -92,10 +99,8 @@ module.exports = backbone.Model.extend({
             this.clock.start(this.getCurrentPartLength());
             this.set('running', true);
         }
-        this.set('totalTimeLeft', (this.getPartLength('warmup') +
-            this.getPartLength('highIntensity') +
-            this.getPartLength('lowIntensity') +
-            this.getPartLength('cooldown')) * this.getSetsCount());
+        this.set('totalTimeLeft', this.getTotalTime());
+        this.set('totalElapsedTime', 0);
         eventBus.trigger('timer:start');
     },
 
