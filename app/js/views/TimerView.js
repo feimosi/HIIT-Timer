@@ -14,6 +14,7 @@ module.exports = backbone.View.extend({
     initialize: function() {
         eventBus.on('button:return', this.hide.bind(this));
         eventBus.on('button:submit', this.show.bind(this));
+        eventBus.on('timer:nextSet', this.refreshDisplayedSet.bind(this));
         this.$el.hide();
     },
     show: function() {
@@ -25,6 +26,7 @@ module.exports = backbone.View.extend({
     render: function() {
         var template = _.template($('#timer-template').html());
         this.$el.html(template(this.model.toJSON()));
+        this.$el.find('#sets').html(this.model.getCurrentSet() + '/' + this.model.getSetsCount());
     },
     refreshDisplayedTime: function(_this) {
         _this.$el.find('#timer-time').html(_this._convertSecondsToString(_this.model.getElapsedTime()));
@@ -35,6 +37,9 @@ module.exports = backbone.View.extend({
                 _this.refreshDisplayedTime(_this);
             }, 500);
         }
+    },
+    refreshDisplayedSet: function() {
+        this.$el.find('#sets').html(this.model.getCurrentSet() + '/' + this.model.getSetsCount());
     },
     _startPauseButtonHandler: function() {
         event.preventDefault();
