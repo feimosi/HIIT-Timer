@@ -17,12 +17,15 @@ module.exports = backbone.View.extend({
             this.$el.show();
         }, this));
     },
+
     render: function() {
         var template = _.template($('#setup-timer-template').html());
         this.$el.html(template(this.model.toJSON()));
     },
+
     submitButtonClick: function(event) {
         event.preventDefault();
         eventBus.trigger('button:submit');
     }
+
 });
