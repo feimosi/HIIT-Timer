@@ -26,7 +26,7 @@ module.exports = backbone.Model.extend({
         },
         sets: 10,
         current: '',
-        currentSet: 1,
+        currentSet: 0,
         running: false,
         totalElapsedTime: 0,
         totalTimeLeft: 0
@@ -138,11 +138,11 @@ module.exports = backbone.Model.extend({
     },
 
     next: function() {
-        this._incrementSetIfApplicable();
         this.set('totalElapsedTime', this.get('totalElapsedTime') + this.getCurrentPartLength());
         this.set('totalTimeLeft', this.get('totalTimeLeft') - this.getCurrentPartLength());
         this.set('current', this.getNextPart());
         this.set('running', true);
+        this._incrementSetIfApplicable();
 
         // FIXME:
         // Workaround for the timer.js bug
@@ -164,7 +164,7 @@ module.exports = backbone.Model.extend({
     },
 
     _incrementSetIfApplicable: function() {
-        if (this.getCurrentPart() === 'cooldown') {
+        if (this.getCurrentPart() === 'warmup') {
             this.set('currentSet', this.getCurrentSet() + 1);
             eventBus.trigger('timer:nextSet', this.getCurrentSet() + '/' + this.getSetsCount());
         }
