@@ -21,6 +21,7 @@ module.exports = backbone.View.extend({
 
     show: function() {
         this.$el.show();
+        this.refreshDisplayedTime();
         this.refreshDisplayedSet();
         this.refreshDisplayedStatus();
     },
@@ -34,15 +35,19 @@ module.exports = backbone.View.extend({
         this.$el.html(template(this.model.toJSON()));
     },
 
-    refreshDisplayedTime: function(_this) {
-        _this.$el.find('#timer-time').html(_this._convertSecondsToString(_this.model.getElapsedTime()));
-        _this.$el.find('#elapsed-time').html(_this._convertSecondsToString(_this.model.getTotalElapsedTime()));
-        _this.$el.find('#remaining-time').html(_this._convertSecondsToString(_this.model.getTotalTimeLeft()));
+    updateDisplayedTimeOnIntervals: function updateDisplayedTimeOnIntervals(_this) {
+        _this.refreshDisplayedTime();
         if (_this.model.isRunning()) {
             setTimeout(function() {
-                _this.refreshDisplayedTime(_this);
+                updateDisplayedTimeOnIntervals(_this);
             }, 500);
         }
+    },
+
+    refreshDisplayedTime: function() {
+        this.$el.find('#timer-time').html(this._convertSecondsToString(this.model.getElapsedTime()));
+        this.$el.find('#elapsed-time').html(this._convertSecondsToString(this.model.getTotalElapsedTime()));
+        this.$el.find('#remaining-time').html(this._convertSecondsToString(this.model.getTotalTimeLeft()));
     },
 
     refreshDisplayedSet: function() {
@@ -65,7 +70,7 @@ module.exports = backbone.View.extend({
             eventBus.trigger('button:continue');
             this._changeButtonLabel('.start-pause-button', 'Pause');
         }
-        this.refreshDisplayedTime(this);
+        this.updateDisplayedTimeOnIntervals(this);
     },
 
     _restartButtonHandler: function() {
