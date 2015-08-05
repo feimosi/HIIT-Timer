@@ -126,6 +126,8 @@ module.exports = backbone.Model.extend({
         this.set('current', '');
         this.set('currentSet', 1);
         this.set('running', false);
+        this.set('totalTimeLeft', this.getTotalTime());
+        this.set('totalElapsedTime', 0);
         eventBus.trigger('timer:stop');
     },
 
