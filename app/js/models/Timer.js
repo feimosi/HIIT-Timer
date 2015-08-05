@@ -5,6 +5,7 @@ var eventBus = require('../EventBus.js');
 module.exports = backbone.Model.extend({
     defaults: {
         alias: {
+            '': 'Get ready',
             warmup: 'Warmup',
             highIntensity: 'High Intensity',
             lowIntensity: 'Low Intensity',
@@ -48,6 +49,10 @@ module.exports = backbone.Model.extend({
 
     getPartLength: function(partName) {
         return this.get('length')[partName];
+    },
+
+    getPartAlias: function(partName) {
+        return this.get('alias')[partName];
     },
 
     getCurrentPartLength: function() {
