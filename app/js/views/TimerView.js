@@ -35,12 +35,10 @@ module.exports = backbone.View.extend({
         this.$el.html(template(this.model.toJSON()));
     },
 
-    updateDisplayedTimeOnIntervals: function updateDisplayedTimeOnIntervals(_this) {
-        _this.refreshDisplayedTime();
-        if (_this.model.isRunning()) {
-            setTimeout(function() {
-                updateDisplayedTimeOnIntervals(_this);
-            }, 500);
+    updateDisplayedTimeOnIntervals: function() {
+        this.refreshDisplayedTime();
+        if (this.model.isRunning()) {
+            setTimeout(this.updateDisplayedTimeOnIntervals.bind(this), 500);
         }
     },
 
@@ -70,7 +68,7 @@ module.exports = backbone.View.extend({
             eventBus.trigger('button:continue');
             this._changeButtonLabel('.start-pause-button', 'Pause');
         }
-        this.updateDisplayedTimeOnIntervals(this);
+        this.updateDisplayedTimeOnIntervals();
     },
 
     _restartButtonHandler: function() {
