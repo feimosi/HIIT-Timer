@@ -144,13 +144,7 @@ module.exports = backbone.Model.extend({
         this.set('running', true);
         this._incrementSetIfApplicable();
 
-        // FIXME:
-        // Workaround for the timer.js bug
-        // this.clock.stop().start(this.getCurrentPartLength());
-        this.clock = new TimerJS({
-            onend: this.next.bind(this)
-        });
-        this.clock.start(this.getCurrentPartLength());
+        this.clock.stop().start(this.getCurrentPartLength());
 
         if (this.getCurrentSet() > this.getSetsCount()) {
             this.stop();
